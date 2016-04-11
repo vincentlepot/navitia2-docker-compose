@@ -38,6 +38,7 @@ services:
       - ./jormungandr.d:/etc/jormungandr.d
       - ./jormungandr_settings.py:/srv/navitia/run/jormungandr_settings.py
     links:
+      - tyr
       - kraken_jdr
       - kraken_fr-cen
       - rabbitmq
@@ -46,10 +47,11 @@ services:
     environment:
       - DOMAIN_NAME=tyr.local.canaltp.fr
     image: zibok/navitia2:2.5.0
-    working_dir: /srv/navitia/source/tyr/tyr/
-    command: /bin/bash -c 'TYR_CONFIG_FILE="/srv/navitia/run/tyr_settings.py" PYTHONPATH="/srv/navitia/source/navitiacommon:/srv/navitia/source/tyr" python "/srv/navitia/source/tyr/manage_tyr.py" runserver -r -t 0.0.0.0 -p 80'
+    working_dir: /srv/navitia/source/tyr
+    command: /bin/bash /launch_tyr.sh
     volumes:
       - ./tyr_settings.py:/srv/navitia/run/tyr_settings.py
+      - ./launch_tyr.sh:/launch_tyr.sh
     links:
       - database
       - rabbitmq
