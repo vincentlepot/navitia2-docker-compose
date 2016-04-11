@@ -1,0 +1,4 @@
+{
+  "key": "jdr",
+  "zmq_socket": "tcp://kraken_jdr:30000"
+}

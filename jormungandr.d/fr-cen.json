@@ -1,0 +1,4 @@
+{
+  "key": "fr-cen",
+  "zmq_socket": "tcp://kraken_fr-cen:30000"
+}

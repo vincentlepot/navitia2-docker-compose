@@ -1,0 +1,60 @@
+version: '2'
+services:
+  database:
+    environment:
+      - POSTGRES_USER=navitia
+      - POSTGRES_PASSWORD=navitia
+      - POSTGRES_DB=jormungandr
+    image: mdillon/postgis:9.1
+
+  rabbitmq:
+    image: rabbitmq:management
+
+  kraken_jdr:
+    image: zibok/navitia2:2.5.0
+    working_dir: /srv/navitia/run
+    command: /srv/navitia/bin/kraken
+    volumes:
+      - ./data/jdr:/srv/data
+    links:
+      - rabbitmq
+
+  kraken_fr-cen:
+    image: zibok/navitia2:2.5.0
+    working_dir: /srv/navitia/run
+    command: /srv/navitia/bin/kraken
+    volumes:
+      - ./data/fr-cen:/srv/data
+    links:
+      - rabbitmq
+
+  jormungandr:
+    environment:
+      - DOMAIN_NAME=navitia2-ws.local.canaltp.fr
+    image: zibok/navitia2:2.5.0
+    working_dir: /srv/navitia/source/jormungandr/jormungandr/
+    command: /bin/bash -c 'JORMUNGANDR_CONFIG_FILE="/srv/navitia/run/jormungandr_settings.py" PYTHONPATH="/srv/navitia/source/navitiacommon:/srv/navitia/source/jormungandr" python "/srv/navitia/source/jormungandr/jormungandr/manage.py" runserver -r -t 0.0.0.0 -p 80'
+    volumes:
+      - ./jormungandr.d:/etc/jormungandr.d
+      - ./jormungandr_settings.py:/srv/navitia/run/jormungandr_settings.py
+    links:
+      - kraken_jdr
+      - kraken_fr-cen
+      - rabbitmq
+
+  tyr:
+    environment:
+      - DOMAIN_NAME=tyr.local.canaltp.fr
+    image: zibok/navitia2:2.5.0
+    working_dir: /srv/navitia/source/tyr/tyr/
+    command: /bin/bash -c 'TYR_CONFIG_FILE="/srv/navitia/run/tyr_settings.py" PYTHONPATH="/srv/navitia/source/navitiacommon:/srv/navitia/source/tyr" python "/srv/navitia/source/tyr/manage_tyr.py" runserver -r -t 0.0.0.0 -p 80'
+    volumes:
+      - ./tyr_settings.py:/srv/navitia/run/tyr_settings.py
+    links:
+      - database
+      - rabbitmq
+
+networks:
+  default:
+    external:
+      name: canaltp
