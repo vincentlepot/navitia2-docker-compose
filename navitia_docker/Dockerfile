@@ -1,5 +1,9 @@
 FROM debian:wheezy
 
+MAINTAINER Vincent Lepot <vincent.lepot@kisio.org>
+
+ARG navitia_version
+
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get -yq install wget && \
     echo 'deb http://apt.canaltp.local/debian/repositories wheezy-production main non-free' > /etc/apt/sources.list.d/canaltp.list && \
@@ -27,7 +31,7 @@ RUN set -xe && \
     DEBIAN_FRONTEND=noninteractive apt-get -yq install $buildDeps && \
     git clone https://github.com/CanalTP/navitia /srv/navitia && \
     cd /srv/navitia && \
-    git checkout v2.5.0 && \
+    git checkout v$navitia_version && \
     sed -i -e 's/git@github.com:/https:\/\/github.com\//g' .gitmodules && \
     git submodule update --init && \
     find . -type d -name '.git' -prune -exec rm -rf {} \; && \
