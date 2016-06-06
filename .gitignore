@@ -1,1 +1,2 @@
-data/*/data.nav.lz4
+/data/*
+!data/*/.placeholder
